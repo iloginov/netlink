@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"syscall"
 
-	"github.com/vishvananda/netlink/nl"
+	"github.com/iloginov/netlink/nl"
 	"golang.org/x/sys/unix"
 )
 
