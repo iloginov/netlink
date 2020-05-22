@@ -3031,3 +3031,45 @@ func addIPoIBAttrs(ipoib *IPoIB, linkInfo *nl.RtAttr) {
 	data.AddRtAttr(nl.IFLA_IPOIB_MODE, nl.Uint16Attr(uint16(ipoib.Mode)))
 	data.AddRtAttr(nl.IFLA_IPOIB_UMCAST, nl.Uint16Attr(uint16(ipoib.Umcast)))
 }
+
+const (
+	IFF_NOMULTIPATH = uint32(0x80000)
+	IFF_MPBACKUP    = uint32(0x100000)
+)
+
+func LinkSetNoMultipath(link Link) error {
+	return pkgHandle.LinkSetNoMultipath(link)
+}
+
+func (h *Handle) LinkSetNoMultipath(link Link) error {
+	base := link.Attrs()
+	h.ensureIndex(base)
+	req := h.newNetlinkRequest(unix.RTM_NEWLINK, unix.NLM_F_ACK)
+
+	msg := nl.NewIfInfomsg(unix.AF_UNSPEC)
+	msg.Change = IFF_NOMULTIPATH
+	msg.Flags = IFF_NOMULTIPATH
+	msg.Index = int32(base.Index)
+	req.AddData(msg)
+
+	_, err := req.Execute(unix.NETLINK_ROUTE, 0)
+	return err
+}
+
+func LinkUnsetNoMultipath(link Link) error {
+	return pkgHandle.LinkUnsetNoMultipath(link)
+}
+
+func (h *Handle) LinkUnsetNoMultipath(link Link) error {
+	base := link.Attrs()
+	h.ensureIndex(base)
+	req := h.newNetlinkRequest(unix.RTM_NEWLINK, unix.NLM_F_ACK)
+
+	msg := nl.NewIfInfomsg(unix.AF_UNSPEC)
+	msg.Change = IFF_NOMULTIPATH
+	msg.Index = int32(base.Index)
+	req.AddData(msg)
+
+	_, err := req.Execute(unix.NETLINK_ROUTE, 0)
+	return err
+}
